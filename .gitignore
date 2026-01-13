@@ -1,0 +1,12 @@
+result
+result-*
+.direnv/
+
+# Opencode
+AGENTS.md
+.opencode/
+opencode.json*
+
+# Claude Code
+CLAUDE.md
+.claude/
