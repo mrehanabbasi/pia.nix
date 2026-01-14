@@ -378,6 +378,10 @@ pkgs.writeShellScriptBin "pia" ''
     local token
     token=$(get_token)
 
+    # Disconnect existing connection BEFORE registering new key
+    # This prevents race conditions with PIA's server when re-connecting
+    wg-quick down pia 2>/dev/null || true
+
     # Generate WireGuard keys
     local priv_key pub_key
     priv_key=$(wg genkey)
@@ -397,9 +401,6 @@ pkgs.writeShellScriptBin "pia" ''
       echo "$wg_response"
       exit 1
     fi
-
-    # Disconnect existing connection
-    wg-quick down pia 2>/dev/null || true
 
     # Create WireGuard config
     mkdir -p /etc/wireguard
