@@ -578,6 +578,9 @@ DOWNSCRIPT
     fi
   }
 
+  # Save original arguments for root re-execution
+  ORIG_ARGS=("$@")
+
   # Parse command line
   COMMAND="''${1:-}"
   shift || true
@@ -632,7 +635,7 @@ DOWNSCRIPT
       search_regions
       ;;
     connect)
-      ensure_root "$@"
+      ensure_root "''${ORIG_ARGS[@]}"
       ensure_credentials
       
       if [[ -z "$REGION" ]]; then
@@ -651,7 +654,7 @@ DOWNSCRIPT
       fi
       ;;
     disconnect)
-      ensure_root "$@"
+      ensure_root "''${ORIG_ARGS[@]}"
       disconnect
       ;;
     status)
