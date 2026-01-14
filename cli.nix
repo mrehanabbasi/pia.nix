@@ -3,52 +3,92 @@
 let
   inherit (lib) getExe;
 
-  # PIA CA certificate for API authentication
-  caCert = pkgs.writeText "ca.rsa.4096.crt" ''
-    -----BEGIN CERTIFICATE-----
-    MIIHqzCCBZOgAwIBAgIJAJ0u+vODZJntMA0GCSqGSIb3DQEBDQUAMIHoMQswCQYD
-    VQQGEwJVUzELMAkGA1UECBMCQ0ExEzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNV
-    BAoTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIElu
-    dGVybmV0IEFjY2VzczEgMB4GA1UEAxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3Mx
-    IDAeBgNVBCkTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkB
-    FiBzZWN1cmVAcHJpdmF0ZWludGVybmV0YWNjZXNzLmNvbTAeFw0xNDA0MTcxNzQw
-    MzNaFw0zNDA0MTIxNzQwMzNaMIHoMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0Ex
-    EzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNVBAoTF1ByaXZhdGUgSW50ZXJuZXQg
-    QWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UE
-    AxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBCkTF1ByaXZhdGUgSW50
-    ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkBFiBzZWN1cmVAcHJpdmF0ZWludGVy
-    bmV0YWNjZXNzLmNvbTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALVk
-    hjumaqBbL8aSgj6xbX1QPTfTd1qHsAZd2B97m8Vw31c/2yQgZNf5qZY0+jOIHULN
-    De4R9TIvyBEbvnAg/OkPw8n/+ScgYOeH876VUXzjLDBnDb8DLr/+w9oVsuDeFJ9K
-    V2UFM1OYX0SnkHnrYAN2QLF98ESK4NCSU01h5zkcgmQ+qKSfA9Ny0/UpsKPBFqsQ
-    25NvjDWFhCpeqCHKUJ4Be27CDbSl7lAkBuHMPHJs8f8xPgAbHRXZOxVCpayZ2SND
-    fCwsnGWpWFoMGvdMbygngCn6jA/W1VSFOlRlfLuuGe7QFfDwA0jaLCxuWt/BgZyl
-    p7tAzYKR8lnWmtUCPm4+BtjyVDYtDCiGBD9Z4P13RFWvJHw5aapx/5W/CuvVyI7p
-    Kwvc2IT+KPxCUhH1XI8ca5RN3C9NoPJJf6qpg4g0rJH3aaWkoMRrYvQ+5PXXYUzj
-    tRHImghRGd/ydERYoAZXuGSbPkm9Y/p2X8unLcW+F0xpJD98+ZI+tzSsI99Zs5wi
-    jSUGYr9/j18KHFTMQ8n+1jauc5bCCegN27dPeKXNSZ5riXFL2XX6BkY68y58UaNz
-    meGMiUL9BOV1iV+PMb7B7PYs7oFLjAhh0EdyvfHkrh/ZV9BEhtFa7yXp8XR0J6vz
-    1YV9R6DYJmLjOEbhU8N0gc3tZm4Qz39lIIG6w3FDAgMBAAGjggFUMIIBUDAdBgNV
-    HQ4EFgQUrsRtyWJftjpdRM0+925Y6Cl08SUwggEfBgNVHSMEggEWMIIBEoAUrsRt
-    yWJftjpdRM0+925Y6Cl08SWhge6kgeswgegxCzAJBgNVBAYTAlVTMQswCQYDVQQI
-    EwJDQTETMBEGA1UEBxMKTG9zQW5nZWxlczEgMB4GA1UEChMXUHJpdmF0ZSBJbnRl
-    cm5ldCBBY2Nlc3MxIDAeBgNVBAsTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAw
-    HgYDVQQDExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UEKRMXUHJpdmF0
-    ZSBJbnRlcm5ldCBBY2Nlc3MxLzAtBgkqhkiG9w0BCQEWIHNlY3VyZUBwcml2YXRl
-    aW50ZXJuZXRhY2Nlc3MuY29tggkAnS7684Nkme0wDAYDVR0TBAUwAwEB/zANBgkq
-    hkiG9w0BAQ0FAAOCAgEAJsfhsPk3r8kLXLxY+v+vHzbr4ufNtqnL9/1Uuf8NrsCt
-    pXAoyZ0YqfbkWx3NHTZ7OE9ZRhdMP/RqHQE1p4N4Sa1nZKhTKasV6KhHDqSCt/dv
-    Em89xWm2MVA7nyzQxVlHa9AkcBaemcXEiyT19XdpiXOP4Vhs+J1R5m8zQOxZlV1G
-    tF9vsXmJqWZpOVPmZ8f35BCsYPvv4yMewnrtAC8PFEK/bOPeYcKN50bol22QYaZu
-    LfpkHfNiFTnfMh8sl/ablPyNY7DUNiP5DRcMdIwmfGQxR5WEQoHL3yPJ42LkB5zs
-    6jIm26DGNXfwura/mi105+ENH1CaROtRYwkiHb08U6qLXXJz80mWJkT90nr8Asj3
-    5xN2cUppg74nG3YVav/38P48T56hG1NHbYF5uOCske19F6wi9maUoto/3vEr0rnX
-    JUp2KODmKdvBI7co245lHBABWikk8VfejQSlCtDBXn644ZMtAdoxKNfR2WTFVEwJ
-    iyd1Fzx0yujuiXDROLhISLQDRjVVAvawrAtLZWYK31bY7KlezPlQnl/D9Asxe85l
-    8jO5+0LdJ6VyOs/Hd4w52alDW/MFySDZSfQHMTIc30hLBJ8OnCEIvluVQQ2UQvoW
-    +no177N9L2Y+M9TcTA62ZyMXShHQGeh20rb4kK8f+iFX8NxtdHVSkxMEFSfDDyQ=
-    -----END CERTIFICATE-----
-  '';
+  # PIA CA certificate for API/WireGuard authentication (RSA 4096)
+  caCertContent = ''
+-----BEGIN CERTIFICATE-----
+MIIHqzCCBZOgAwIBAgIJAJ0u+vODZJntMA0GCSqGSIb3DQEBDQUAMIHoMQswCQYD
+VQQGEwJVUzELMAkGA1UECBMCQ0ExEzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNV
+BAoTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIElu
+dGVybmV0IEFjY2VzczEgMB4GA1UEAxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3Mx
+IDAeBgNVBCkTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkB
+FiBzZWN1cmVAcHJpdmF0ZWludGVybmV0YWNjZXNzLmNvbTAeFw0xNDA0MTcxNzQw
+MzNaFw0zNDA0MTIxNzQwMzNaMIHoMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0Ex
+EzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNVBAoTF1ByaXZhdGUgSW50ZXJuZXQg
+QWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UE
+AxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBCkTF1ByaXZhdGUgSW50
+ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkBFiBzZWN1cmVAcHJpdmF0ZWludGVy
+bmV0YWNjZXNzLmNvbTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALVk
+hjumaqBbL8aSgj6xbX1QPTfTd1qHsAZd2B97m8Vw31c/2yQgZNf5qZY0+jOIHULN
+De4R9TIvyBEbvnAg/OkPw8n/+ScgYOeH876VUXzjLDBnDb8DLr/+w9oVsuDeFJ9K
+V2UFM1OYX0SnkHnrYAN2QLF98ESK4NCSU01h5zkcgmQ+qKSfA9Ny0/UpsKPBFqsQ
+25NvjDWFhCpeqCHKUJ4Be27CDbSl7lAkBuHMPHJs8f8xPgAbHRXZOxVCpayZ2SND
+fCwsnGWpWFoMGvdMbygngCn6jA/W1VSFOlRlfLuuGe7QFfDwA0jaLCxuWt/BgZyl
+p7tAzYKR8lnWmtUCPm4+BtjyVDYtDCiGBD9Z4P13RFWvJHw5aapx/5W/CuvVyI7p
+Kwvc2IT+KPxCUhH1XI8ca5RN3C9NoPJJf6qpg4g0rJH3aaWkoMRrYvQ+5PXXYUzj
+tRHImghRGd/ydERYoAZXuGSbPkm9Y/p2X8unLcW+F0xpJD98+ZI+tzSsI99Zs5wi
+jSUGYr9/j18KHFTMQ8n+1jauc5bCCegN27dPeKXNSZ5riXFL2XX6BkY68y58UaNz
+meGMiUL9BOV1iV+PMb7B7PYs7oFLjAhh0EdyvfHkrh/ZV9BEhtFa7yXp8XR0J6vz
+1YV9R6DYJmLjOEbhU8N0gc3tZm4Qz39lIIG6w3FDAgMBAAGjggFUMIIBUDAdBgNV
+HQ4EFgQUrsRtyWJftjpdRM0+925Y6Cl08SUwggEfBgNVHSMEggEWMIIBEoAUrsRt
+yWJftjpdRM0+925Y6Cl08SWhge6kgeswgegxCzAJBgNVBAYTAlVTMQswCQYDVQQI
+EwJDQTETMBEGA1UEBxMKTG9zQW5nZWxlczEgMB4GA1UEChMXUHJpdmF0ZSBJbnRl
+cm5ldCBBY2Nlc3MxIDAeBgNVBAsTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAw
+HgYDVQQDExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UEKRMXUHJpdmF0
+ZSBJbnRlcm5ldCBBY2Nlc3MxLzAtBgkqhkiG9w0BCQEWIHNlY3VyZUBwcml2YXRl
+aW50ZXJuZXRhY2Nlc3MuY29tggkAnS7684Nkme0wDAYDVR0TBAUwAwEB/zANBgkq
+hkiG9w0BAQ0FAAOCAgEAJsfhsPk3r8kLXLxY+v+vHzbr4ufNtqnL9/1Uuf8NrsCt
+pXAoyZ0YqfbkWx3NHTZ7OE9ZRhdMP/RqHQE1p4N4Sa1nZKhTKasV6KhHDqSCt/dv
+Em89xWm2MVA7nyzQxVlHa9AkcBaemcXEiyT19XdpiXOP4Vhs+J1R5m8zQOxZlV1G
+tF9vsXmJqWZpOVPmZ8f35BCsYPvv4yMewnrtAC8PFEK/bOPeYcKN50bol22QYaZu
+LfpkHfNiFTnfMh8sl/ablPyNY7DUNiP5DRcMdIwmfGQxR5WEQoHL3yPJ42LkB5zs
+6jIm26DGNXfwura/mi105+ENH1CaROtRYwkiHb08U6qLXXJz80mWJkT90nr8Asj3
+5xN2cUppg74nG3YVav/38P48T56hG1NHbYF5uOCske19F6wi9maUoto/3vEr0rnX
+JUp2KODmKdvBI7co245lHBABWikk8VfejQSlCtDBXn644ZMtAdoxKNfR2WTFVEwJ
+iyd1Fzx0yujuiXDROLhISLQDRjVVAvawrAtLZWYK31bY7KlezPlQnl/D9Asxe85l
+8jO5+0LdJ6VyOs/Hd4w52alDW/MFySDZSfQHMTIc30hLBJ8OnCEIvluVQQ2UQvoW
++no177N9L2Y+M9TcTA62ZyMXShHQGeh20rb4kK8f+iFX8NxtdHVSkxMEFSfDDyQ=
+-----END CERTIFICATE-----
+'';
+
+  # CA certificate as a file (for curl --cacert)
+  caCert = pkgs.writeText "ca.rsa.4096.crt" caCertContent;
+
+  # PIA CA certificate for OpenVPN (different from API cert)
+  ovpnCaCertContent = ''
+-----BEGIN CERTIFICATE-----
+MIIFqzCCBJOgAwIBAgIJAKZ7D5Yv87qDMA0GCSqGSIb3DQEBDQUAMIHoMQswCQYD
+VQQGEwJVUzELMAkGA1UECBMCQ0ExEzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNV
+BAoTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIElu
+dGVybmV0IEFjY2VzczEgMB4GA1UEAxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3Mx
+IDAeBgNVBCkTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkB
+FiBzZWN1cmVAcHJpdmF0ZWludGVybmV0YWNjZXNzLmNvbTAeFw0xNDA0MTcxNzM1
+MThaFw0zNDA0MTIxNzM1MThaMIHoMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0Ex
+EzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNVBAoTF1ByaXZhdGUgSW50ZXJuZXQg
+QWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UE
+AxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBCkTF1ByaXZhdGUgSW50
+ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkBFiBzZWN1cmVAcHJpdmF0ZWludGVy
+bmV0YWNjZXNzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAPXD
+L1L9tX6DGf36liA7UBTy5I869z0UVo3lImfOs/GSiFKPtInlesP65577nd7UNzzX
+lH/P/CnFPdBWlLp5ze3HRBCc/Avgr5CdMRkEsySL5GHBZsx6w2cayQ2EcRhVTwWp
+cdldeNO+pPr9rIgPrtXqT4SWViTQRBeGM8CDxAyTopTsobjSiYZCF9Ta1gunl0G/
+8Vfp+SXfYCC+ZzWvP+L1pFhPRqzQQ8k+wMZIovObK1s+nlwPaLyayzw9a8sUnvWB
+/5rGPdIYnQWPgoNlLN9HpSmsAcw2z8DXI9pIxbr74cb3/HSfuYGOLkRqrOk6h4RC
+OfuWoTrZup1uEOn+fw8CAwEAAaOCAVQwggFQMB0GA1UdDgQWBBQv63nQ/pJAt5tL
+y8VJcbHe22ZOsjCCAR8GA1UdIwSCARYwggESgBQv63nQ/pJAt5tLy8VJcbHe22ZO
+sqGB7qSB6zCB6DELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRMwEQYDVQQHEwpM
+b3NBbmdlbGVzMSAwHgYDVQQKExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4G
+A1UECxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBAMTF1ByaXZhdGUg
+SW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQpExdQcml2YXRlIEludGVybmV0IEFjY2Vz
+czEvMC0GCSqGSIb3DQEJARYgc2VjdXJlQHByaXZhdGVpbnRlcm5ldGFjY2Vzcy5j
+b22CCQCmew+WL/O6gzAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBDQUAA4IBAQAn
+a5PgrtxfwTumD4+3/SYvwoD66cB8IcK//h1mCzAduU8KgUXocLx7QgJWo9lnZ8xU
+ryXvWab2usg4fqk7FPi00bED4f4qVQFVfGfPZIH9QQ7/48bPM9RyfzImZWUCenK3
+7pdw4Bvgoys2rHLHbGen7f28knT2j/cbMxd78tQc20TIObGjo8+ISTRclSTRBtyC
+GohseKYpTS9himFERpUgNtefvYHbn70mIOzfOJFTVqfrptf9jXa9N8Mpy3ayfodz
+1wiqdteqFXkTYoSDctgKMiZ6GdocK9nMroQipIQtpnwd4yBDWIyC6Bvlkrq5TQUt
+YDQ8z9v+DMO6iwyIDRiU
+-----END CERTIFICATE-----
+'';
 
   # OpenVPN standard configuration template
   ovpnStandard = pkgs.writeText "standard.ovpn" ''
@@ -66,9 +106,8 @@ let
     compress
     verb 1
     reneg-sec 0
-    <crt>
-    ${builtins.readFile caCert}
-    </crt>
+    <ca>
+    ${ovpnCaCertContent}</ca>
     disable-occ
     script-security 2
     up /opt/piavpn-manual/openvpn_up.sh
@@ -91,9 +130,8 @@ let
     compress
     verb 1
     reneg-sec 0
-    <crt>
-    ${builtins.readFile caCert}
-    </crt>
+    <ca>
+    ${ovpnCaCertContent}</ca>
     disable-occ
     script-security 2
     up /opt/piavpn-manual/openvpn_up.sh
@@ -113,6 +151,7 @@ let
     iproute2
     procps
     findutils
+    systemd
   ];
 
 in
@@ -153,25 +192,42 @@ pkgs.writeShellScriptBin "pia" ''
     echo "  --protocol <wg|ovpn>  VPN protocol (default: wg)"
     echo "  --port-forward        Enable port forwarding"
     echo "  --dns                 Use PIA DNS servers"
+    echo "  --credentials-file    Path to credentials file"
     echo ""
     echo "Environment variables:"
     echo "  PIA_USER              PIA username (p#######)"
     echo "  PIA_PASS              PIA password"
     echo "  PIA_TOKEN             Authentication token (if already obtained)"
+    echo "  PIA_CREDENTIALS_FILE  Path to credentials file"
+    echo ""
+    echo "Credentials file format (two lines):"
+    echo "  Line 1: PIA username (p#######)"
+    echo "  Line 2: PIA password"
+    echo ""
+    echo "Default credentials file: /run/secrets/pia (for sops-nix/agenix)"
     echo ""
     echo "Examples:"
     echo "  pia list"
     echo "  pia connect japan --protocol wg"
     echo "  pia connect us-east --protocol ovpn --port-forward"
+    echo "  pia connect ae --credentials-file /path/to/creds"
     echo "  pia disconnect"
   }
 
   ensure_root() {
     if [[ $EUID -ne 0 ]]; then
+      # Build list of environment variables to preserve
+      local env_args=()
+      [[ -n "''${PIA_USER:-}" ]] && env_args+=("PIA_USER=$PIA_USER")
+      [[ -n "''${PIA_PASS:-}" ]] && env_args+=("PIA_PASS=$PIA_PASS")
+      [[ -n "''${PIA_TOKEN:-}" ]] && env_args+=("PIA_TOKEN=$PIA_TOKEN")
+      [[ -n "''${PIA_CREDENTIALS_FILE:-}" ]] && env_args+=("PIA_CREDENTIALS_FILE=$PIA_CREDENTIALS_FILE")
+
       if command -v doas &>/dev/null; then
-        exec doas "$0" "$@"
+        exec doas "''${env_args[@]}" "$0" "$@"
       elif command -v sudo &>/dev/null; then
-        exec sudo "$0" "$@"
+        # Use env to set variables, as sudo may not preserve them
+        exec sudo env "''${env_args[@]}" "$0" "$@"
       else
         echo -e "''${RED}This command requires root privileges.''${NC}"
         exit 1
@@ -180,13 +236,47 @@ pkgs.writeShellScriptBin "pia" ''
   }
 
   ensure_credentials() {
-    if [[ -z "''${PIA_USER:-}" ]] || [[ -z "''${PIA_PASS:-}" ]]; then
-      if [[ -z "''${PIA_TOKEN:-}" ]]; then
-        echo -e "''${RED}Error: PIA_USER and PIA_PASS environment variables required.''${NC}"
-        echo "Or provide PIA_TOKEN if you already have an authentication token."
-        exit 1
+    # If we already have user/pass or token, we're good
+    if [[ -n "''${PIA_USER:-}" ]] && [[ -n "''${PIA_PASS:-}" ]]; then
+      return
+    fi
+    if [[ -n "''${PIA_TOKEN:-}" ]]; then
+      return
+    fi
+
+    # Try to load from credentials file
+    local creds_file="''${PIA_CREDENTIALS_FILE:-}"
+    
+    # Default to /run/secrets/pia if no file specified (common sops-nix/agenix path)
+    if [[ -z "$creds_file" ]]; then
+      creds_file="/run/secrets/pia"
+    fi
+
+    if [[ -f "$creds_file" ]]; then
+      echo -e "''${BLUE}Loading credentials from $creds_file...''${NC}" >&2
+      # Read credentials, trimming trailing whitespace/newlines
+      PIA_USER=$(sed -n '1p' "$creds_file" | sed 's/[[:space:]]*$//')
+      PIA_PASS=$(sed -n '2p' "$creds_file" | sed 's/[[:space:]]*$//')
+      export PIA_USER PIA_PASS
+      
+      if [[ -n "$PIA_USER" ]] && [[ -n "$PIA_PASS" ]]; then
+        return
       fi
     fi
+
+    echo -e "''${RED}Error: No credentials found.''${NC}"
+    echo ""
+    echo "Provide credentials using one of these methods:"
+    echo "  1. Environment variables: PIA_USER and PIA_PASS"
+    echo "  2. Environment variable: PIA_TOKEN (if you have one)"
+    echo "  3. Credentials file: PIA_CREDENTIALS_FILE=/path/to/file"
+    echo "  4. CLI flag: --credentials-file /path/to/file"
+    echo "  5. Default file: /run/secrets/pia (for sops-nix/agenix)"
+    echo ""
+    echo "Credentials file format (two lines):"
+    echo "  Line 1: PIA username (p#######)"
+    echo "  Line 2: PIA password"
+    exit 1
   }
 
   get_token() {
@@ -195,7 +285,7 @@ pkgs.writeShellScriptBin "pia" ''
       return
     fi
 
-    echo -e "''${BLUE}Getting authentication token...''${NC}"
+    echo -e "''${BLUE}Getting authentication token...''${NC}" >&2
     local response
     response=$(curl -s --location --request POST \
       'https://www.privateinternetaccess.com/api/client/v2/token' \
@@ -206,11 +296,11 @@ pkgs.writeShellScriptBin "pia" ''
     token=$(echo "$response" | jq -r '.token // empty')
     
     if [[ -z "$token" ]]; then
-      echo -e "''${RED}Failed to authenticate. Check your credentials.''${NC}"
+      echo -e "''${RED}Failed to authenticate. Check your credentials.''${NC}" >&2
       exit 1
     fi
     
-    echo -e "''${GREEN}Authentication successful!''${NC}"
+    echo -e "''${GREEN}Authentication successful!''${NC}" >&2
     echo "$token"
   }
 
@@ -313,18 +403,34 @@ pkgs.writeShellScriptBin "pia" ''
 
     # Create WireGuard config
     mkdir -p /etc/wireguard
-    local dns_config=""
+    local dns_server=""
+    local post_up=""
+    local post_down=""
+    
     if [[ "$use_dns" == "true" ]]; then
-      local dns_server
       dns_server=$(echo "$wg_response" | jq -r '.dns_servers[0]')
-      dns_config="DNS = $dns_server"
+      if [[ -n "$dns_server" ]] && [[ "$dns_server" != "null" ]]; then
+        # Check if systemd-resolved is actually running
+        if systemctl is-active --quiet systemd-resolved 2>/dev/null; then
+          # Use resolvectl for systemd-resolved
+          post_up="PostUp = resolvectl dns %i $dns_server; resolvectl domain %i ~."
+          post_down="PostDown = resolvectl revert %i"
+        else
+          # Fallback: directly modify /etc/resolv.conf
+          # Note: We don't use DNS= directive as wg-quick may fail without resolvconf
+          post_up="PostUp = cp /etc/resolv.conf /etc/resolv.conf.pia-backup 2>/dev/null || true; printf 'nameserver %s\n' '$dns_server' > /etc/resolv.conf"
+          post_down="PostDown = cp /etc/resolv.conf.pia-backup /etc/resolv.conf 2>/dev/null || true; rm -f /etc/resolv.conf.pia-backup"
+        fi
+        echo -e "''${BLUE}Using PIA DNS server: $dns_server''${NC}" >&2
+      fi
     fi
 
     cat > /etc/wireguard/pia.conf <<EOF
 [Interface]
 Address = $(echo "$wg_response" | jq -r '.peer_ip')
 PrivateKey = $priv_key
-$dns_config
+$post_up
+$post_down
 
 [Peer]
 PersistentKeepalive = 25
@@ -399,21 +505,29 @@ EOF
     # Create up/down scripts
     if [[ "$use_dns" == "true" ]]; then
       cat > "$PIA_DIR/openvpn_up.sh" <<'UPSCRIPT'
-#!/bin/bash
-printf '%s\n' "nameserver $DNS_1" > /etc/resolv.conf
+#!/usr/bin/env bash
+# DNS_1 is set by OpenVPN from the pushed options
+if [[ -n "$DNS_1" ]]; then
+  cp /etc/resolv.conf /etc/resolv.conf.pia-backup 2>/dev/null || true
+  printf 'nameserver %s\n' "$DNS_1" > /etc/resolv.conf
+fi
 echo "$route_vpn_gateway" > /opt/piavpn-manual/route_info
 UPSCRIPT
       cat > "$PIA_DIR/openvpn_down.sh" <<'DOWNSCRIPT'
-#!/bin/bash
-# Restore DNS settings here if needed
+#!/usr/bin/env bash
+if [[ -f /etc/resolv.conf.pia-backup ]]; then
+  cp /etc/resolv.conf.pia-backup /etc/resolv.conf
+  rm -f /etc/resolv.conf.pia-backup
+fi
 DOWNSCRIPT
     else
       cat > "$PIA_DIR/openvpn_up.sh" <<'UPSCRIPT'
-#!/bin/bash
+#!/usr/bin/env bash
 echo "$route_vpn_gateway" > /opt/piavpn-manual/route_info
 UPSCRIPT
       cat > "$PIA_DIR/openvpn_down.sh" <<'DOWNSCRIPT'
-#!/bin/bash
+#!/usr/bin/env bash
+# No DNS changes to revert
 DOWNSCRIPT
     fi
     chmod +x "$PIA_DIR/openvpn_up.sh" "$PIA_DIR/openvpn_down.sh"
@@ -561,18 +675,34 @@ DOWNSCRIPT
     
     echo ""
     
-    # Check OpenVPN
+    # Check OpenVPN - first check for tun interface, then PID file
+    local ovpn_connected=false
+    
+    # Check if tun06 interface exists (OpenVPN's default interface)
+    if ip link show tun06 &>/dev/null; then
+      ovpn_connected=true
+    fi
+    
+    # Also check PID file
+    local pid=""
     if [[ -f "$PIA_DIR/pia_pid" ]]; then
-      local pid
       pid=$(cat "$PIA_DIR/pia_pid" 2>/dev/null || echo "")
       if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
-        echo -e "''${GREEN}OpenVPN (PID $pid): Connected''${NC}"
-        local gateway
-        gateway=$(cat "$PIA_DIR/route_info" 2>/dev/null || echo "unknown")
-        echo "Gateway: $gateway"
+        ovpn_connected=true
       else
-        echo "OpenVPN: Not connected"
+        pid=""
       fi
+    fi
+    
+    if [[ "$ovpn_connected" == "true" ]]; then
+      if [[ -n "$pid" ]]; then
+        echo -e "''${GREEN}OpenVPN (PID $pid): Connected''${NC}"
+      else
+        echo -e "''${GREEN}OpenVPN (tun06): Connected''${NC}"
+      fi
+      local gateway
+      gateway=$(cat "$PIA_DIR/route_info" 2>/dev/null || echo "unknown")
+      echo "Gateway: $gateway"
     else
       echo "OpenVPN: Not connected"
     fi
@@ -617,6 +747,10 @@ DOWNSCRIPT
       --strong)
         ENCRYPTION="strong"
         shift
+        ;;
+      --credentials-file)
+        export PIA_CREDENTIALS_FILE="$2"
+        shift 2
         ;;
       *)
         if [[ -z "$REGION" ]]; then
