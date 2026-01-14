@@ -12,7 +12,6 @@ let
     mkOption
     mkEnableOption
     mkIf
-    mkMerge
     types
     optionalString
     ;
@@ -72,7 +71,10 @@ in
     };
 
     protocol = mkOption {
-      type = types.enum [ "wireguard" "openvpn" ];
+      type = types.enum [
+        "wireguard"
+        "openvpn"
+      ];
       default = "wireguard";
       description = "VPN protocol to use.";
     };
@@ -105,13 +107,19 @@ in
 
     openvpn = {
       protocol = mkOption {
-        type = types.enum [ "udp" "tcp" ];
+        type = types.enum [
+          "udp"
+          "tcp"
+        ];
         default = "udp";
         description = "OpenVPN transport protocol.";
       };
 
       encryption = mkOption {
-        type = types.enum [ "standard" "strong" ];
+        type = types.enum [
+          "standard"
+          "strong"
+        ];
         default = "standard";
         description = ''
           OpenVPN encryption strength.
@@ -142,7 +150,10 @@ in
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
 
-      path = [ cfg.package pkgs.coreutils ];
+      path = [
+        cfg.package
+        pkgs.coreutils
+      ];
 
       script =
         let
@@ -154,13 +165,16 @@ in
 
           # Credential setup - either from file or inline
           credSetup =
-            if cfg.credentials.credentialsFile != null then ''
-              export PIA_USER=$(head -n1 ${cfg.credentials.credentialsFile})
-              export PIA_PASS=$(tail -n1 ${cfg.credentials.credentialsFile})
-            '' else ''
-              export PIA_USER=${lib.escapeShellArg cfg.credentials.username}
-              export PIA_PASS=${lib.escapeShellArg cfg.credentials.password}
-            '';
+            if cfg.credentials.credentialsFile != null then
+              ''
+                export PIA_USER=$(head -n1 ${cfg.credentials.credentialsFile})
+                export PIA_PASS=$(tail -n1 ${cfg.credentials.credentialsFile})
+              ''
+            else
+              ''
+                export PIA_USER=${lib.escapeShellArg cfg.credentials.username}
+                export PIA_PASS=${lib.escapeShellArg cfg.credentials.password}
+              '';
         in
         ''
           ${credSetup}
