@@ -184,6 +184,7 @@ pkgs.writeShellScriptBin "pia" ''
       echo "  connect <region>      Connect to a VPN region"
       echo "  disconnect            Disconnect from VPN"
       echo "  status                Show current VPN connection status"
+      echo "    --short, -s         Output short status for scripts/status bars"
       echo "  token                 Get authentication token"
       echo ""
       echo "Options:"
@@ -210,6 +211,7 @@ pkgs.writeShellScriptBin "pia" ''
       echo "  pia connect us-east --protocol ovpn --port-forward"
       echo "  pia connect ae --credentials-file /path/to/creds"
       echo "  pia disconnect"
+      echo "  pia status --short            # For waybar/polybar/i3status"
     }
 
     ensure_root() {
@@ -661,21 +663,17 @@ DOWNSCRIPT
     }
 
     show_status() {
-      echo -e "''${BLUE}VPN Status:''${NC}"
-      echo ""
+      local short_mode="''${1:-false}"
       
       # Check WireGuard
+      local wg_connected=false
       if ip link show pia &>/dev/null; then
-        echo -e "''${GREEN}WireGuard (pia): Connected''${NC}"
-        wg show pia 2>/dev/null || true
-      else
-        echo "WireGuard (pia): Not connected"
+        wg_connected=true
       fi
-      
-      echo ""
       
       # Check OpenVPN - first check for tun interface, then PID file
       local ovpn_connected=false
+      local pid=""
       
       # Check if tun06 interface exists (OpenVPN's default interface)
       if ip link show tun06 &>/dev/null; then
@@ -683,7 +681,6 @@ DOWNSCRIPT
       fi
       
       # Also check PID file
-      local pid=""
       if [[ -f "$PIA_DIR/pia_pid" ]]; then
         pid=$(cat "$PIA_DIR/pia_pid" 2>/dev/null || echo "")
         if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
@@ -692,6 +689,31 @@ DOWNSCRIPT
           pid=""
         fi
       fi
+      
+      # Short mode for status bars / systray integration
+      if [[ "$short_mode" == "true" ]]; then
+        if [[ "$wg_connected" == "true" ]]; then
+          echo "connected:wg"
+        elif [[ "$ovpn_connected" == "true" ]]; then
+          echo "connected:ovpn"
+        else
+          echo "disconnected"
+        fi
+        return
+      fi
+      
+      # Full status output
+      echo -e "''${BLUE}VPN Status:''${NC}"
+      echo ""
+      
+      if [[ "$wg_connected" == "true" ]]; then
+        echo -e "''${GREEN}WireGuard (pia): Connected''${NC}"
+        wg show pia 2>/dev/null || true
+      else
+        echo "WireGuard (pia): Not connected"
+      fi
+      
+      echo ""
       
       if [[ "$ovpn_connected" == "true" ]]; then
         if [[ -n "$pid" ]]; then
@@ -720,6 +742,7 @@ DOWNSCRIPT
     REGION=""
     OVPN_PROTOCOL="udp"
     ENCRYPTION="standard"
+    SHORT_OUTPUT="false"
 
     while [[ $# -gt 0 ]]; do
       case "$1" in
@@ -750,6 +773,10 @@ DOWNSCRIPT
         --credentials-file)
           export PIA_CREDENTIALS_FILE="$2"
           shift 2
+          ;;
+        --short|-s)
+          SHORT_OUTPUT="true"
+          shift
           ;;
         *)
           if [[ -z "$REGION" ]]; then
@@ -791,7 +818,7 @@ DOWNSCRIPT
         disconnect
         ;;
       status)
-        show_status
+        show_status "$SHORT_OUTPUT"
         ;;
       token)
         ensure_credentials

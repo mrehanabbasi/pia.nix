@@ -211,6 +211,10 @@ pia connect uk --protocol ovpn --tcp --strong
 # Check connection status
 pia status
 
+# Short status output (for scripts/status bars)
+pia status --short
+# Output: "connected:wg", "connected:ovpn", or "disconnected"
+
 # Disconnect
 pia disconnect
 
@@ -234,9 +238,49 @@ Run `pia list` to see all available regions sorted alphabetically. Common region
 | `us_east` | US East | No |
 | `us_west` | US West | No |
 
+## Status Bar Integration
+
+The `pia status --short` command outputs a simple string suitable for status bars like waybar, polybar, or i3status:
+
+- `connected:wg` - Connected via WireGuard
+- `connected:ovpn` - Connected via OpenVPN  
+- `disconnected` - Not connected
+
+### Waybar Example
+
+```json
+{
+  "custom/vpn": {
+    "exec": "pia status --short",
+    "interval": 5,
+    "format": "VPN: {}",
+    "return-type": ""
+  }
+}
+```
+
+### Polybar Example
+
+```ini
+[module/vpn]
+type = custom/script
+exec = pia status --short
+interval = 5
+format = <label>
+label = VPN: %output%
+```
+
+### i3blocks Example
+
+```ini
+[vpn]
+command=pia status --short
+interval=5
+```
+
 ## Port Forwarding
 
-Port forwarding is available in most regions (check the `PF` column in `pia list`).
+Port forwarding is available in most regions (check the `Port Forward` column in `pia list`).
 When enabled, PIA assigns you a forwarded port that you can use for services like
 torrents, game servers, or other applications that need incoming connections.
 
