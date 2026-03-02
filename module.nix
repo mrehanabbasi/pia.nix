@@ -22,8 +22,8 @@ in
 
     package = mkOption {
       type = types.package;
-      default = self.packages.${pkgs.system}.pia;
-      defaultText = "self.packages.\${pkgs.system}.pia";
+      default = self.packages.${pkgs.stdenv.hostPlatform.system}.pia;
+      defaultText = "self.packages.\${pkgs.stdenv.hostPlatform.system}.pia";
       description = "The PIA CLI package to use.";
     };
 
