@@ -25,7 +25,7 @@ Add to your flake inputs:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    pia.url = "github:yourusername/pia.nix";
+    pia.url = "github:mrehanabbasi/pia.nix";
     pia.inputs.nixpkgs.follows = "nixpkgs";
   };
 
